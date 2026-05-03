@@ -1,6 +1,6 @@
 """Bring back the sensor attributes from the YAML config."""
 
-from datetime import datetime
+from homeassistant.util import dt as dt_util
 
 from .const import (
     binMappings,
@@ -57,33 +57,25 @@ def createExtendedAttributes(self) -> dict[str, any]:
         rPhase = "Stopped"
     else:
         rPhase = phaseMappings.get(phase, phase)
-    if missionStartTime and missionStartTime != 0:
-        time = datetime.fromtimestamp(missionStartTime)
-        elapsed = round((datetime.now().timestamp() - time.timestamp()) / 60)
-        if elapsed > 60:
-            jobTime = f"{elapsed // 60}h {f'{elapsed % 60:0>2d}'}m"
-        else:
-            jobTime = f"{elapsed}m"
-    else:
-        jobTime = "n-a"
-    if rechargeTime and rechargeTime != 0:
-        time = datetime.fromtimestamp(rechargeTime)
-        resume = round((datetime.now().timestamp() - time.timestamp()) / 60)
-        if 'elapsed' in locals() and elapsed > 60:
-            jobResumeTime = f"{resume // 60}h {f'{resume % 60:0>2d}'}m"
-        else:
-            jobResumeTime = f"{resume}m"
-    else:
-        jobResumeTime = "n-a"
-    if expireTime and expireTime != 0:
-        time = datetime.fromtimestamp(expireTime)
-        expire = round((datetime.now().timestamp() - time.timestamp()) / 60)
-        if 'elapsed' in locals() and elapsed > 60:
-            jobExpireTime = f"{expire // 60}h {f'{expire % 60:0>2d}'}m"
-        else:
-            jobExpireTime = f"{expire}m"
-    else:
-        jobExpireTime = "n-a"
+    def _minutes_since(ts: int | None) -> int | None:
+        """Return minutes between an epoch timestamp and now, or None."""
+        if not ts:
+            return None
+        return round((dt_util.utcnow().timestamp() - ts) / 60)
+
+    def _format_minutes(minutes: int | None, long_form: bool) -> str:
+        """Format a minute count as either `Nm` or `Hh MMm`."""
+        if minutes is None:
+            return "n-a"
+        if long_form:
+            return f"{minutes // 60}h {minutes % 60:0>2d}m"
+        return f"{minutes}m"
+
+    elapsed = _minutes_since(missionStartTime)
+    long_form = elapsed is not None and elapsed > 60
+    jobTime = _format_minutes(elapsed, long_form)
+    jobResumeTime = _format_minutes(_minutes_since(rechargeTime), long_form)
+    jobExpireTime = _format_minutes(_minutes_since(expireTime), long_form)
     # Bin
     robotBin = data.get("bin", {"full": False, "present": False})
     binFull = robotBin.get("full")

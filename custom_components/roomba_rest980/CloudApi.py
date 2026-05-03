@@ -370,7 +370,10 @@ class iRobotCloudApi:
         return await self.login_irobot()
 
     async def _aws_request(
-        self, url: str, params: dict[str, Any] | None = None
+        self,
+        url: str,
+        params: dict[str, Any] | None = None,
+        _retries: int = 0,
     ) -> dict[str, Any]:
         """Make an authenticated AWS request."""
         if not self.credentials:
@@ -414,11 +417,13 @@ class iRobotCloudApi:
 
         async with self.session.get(final_url, headers=signed_headers) as response:
             if response.status != 200:
-                if response.status == 403:
+                if response.status == 403 and _retries < 2:
                     await self.authenticate()
-                    _LOGGER.debug("Reauthenticating API")
-                    return await self._aws_request(url, params)
-                raise CloudApiError(f"AWS request failed: {response.status}")
+                    _LOGGER.debug("Reauthenticating API (retry %d)", _retries + 1)
+                    return await self._aws_request(url, params, _retries + 1)
+                raise CloudApiError(
+                    f"AWS request failed: {response.status} after {_retries} retries"
+                )
 
             return await response.json()
 
