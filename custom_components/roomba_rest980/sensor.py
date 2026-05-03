@@ -242,6 +242,7 @@ class MopTankLevel(RoombaSensor):
         """Initialize."""
         super().__init__(coordinator, entry)
         self._attr_native_unit_of_measurement = PERCENTAGE
+        self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
         self._attr_icon = "mdi:cup-water"
 
@@ -261,7 +262,9 @@ class RoombaBatterySensor(RoombaSensor):
     def __init__(self, coordinator, entry) -> None:
         """Create a new battery level sensor."""
         super().__init__(coordinator, entry)
+        self._attr_device_class = SensorDeviceClass.BATTERY
         self._attr_native_unit_of_measurement = PERCENTAGE
+        self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
 
     def _handle_coordinator_update(self):
@@ -457,6 +460,7 @@ class RoombaRSSI(RoombaSensor):
         super().__init__(coordinator, entry)
         self._attr_device_class = SensorDeviceClass.SIGNAL_STRENGTH
         self._attr_native_unit_of_measurement = SIGNAL_STRENGTH_DECIBELS_MILLIWATT
+        self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
         self._attr_icon = "mdi:signal"
 
@@ -464,7 +468,7 @@ class RoombaRSSI(RoombaSensor):
         """Update sensor when coordinator data changes."""
         data = self.coordinator.data or {}
         signal_info = data.get("signal") or {}
-        self._attr_native_value = signal_info.get("rssi", "n-a")
+        self._attr_native_value = signal_info.get("rssi")
         self.async_write_ha_state()
 
 
@@ -478,6 +482,7 @@ class RoombaSNR(RoombaSensor):
         super().__init__(coordinator, entry)
         self._attr_device_class = SensorDeviceClass.SIGNAL_STRENGTH
         self._attr_native_unit_of_measurement = SIGNAL_STRENGTH_DECIBELS
+        self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
         self._attr_icon = "mdi:signal"
 
@@ -485,7 +490,7 @@ class RoombaSNR(RoombaSensor):
         """Update sensor when coordinator data changes."""
         data = self.coordinator.data or {}
         signal_info = data.get("signal") or {}
-        self._attr_native_value = signal_info.get("snr", "n-a")
+        self._attr_native_value = signal_info.get("snr")
         self.async_write_ha_state()
 
 
@@ -499,6 +504,7 @@ class RoombaNetworkNoise(RoombaSensor):
         super().__init__(coordinator, entry)
         self._attr_device_class = SensorDeviceClass.SIGNAL_STRENGTH
         self._attr_native_unit_of_measurement = SIGNAL_STRENGTH_DECIBELS
+        self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
         self._attr_icon = "mdi:signal"
 

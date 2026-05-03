@@ -47,6 +47,8 @@ class RoombaVacuum(CoordinatorEntity, StateVacuumEntity):
 
 
 
+    _attr_has_entity_name = True
+
     def __init__(self, hass: HomeAssistant, coordinator, entry: ConfigEntry) -> None:
         """Setup the robot."""
         super().__init__(coordinator)
@@ -54,7 +56,7 @@ class RoombaVacuum(CoordinatorEntity, StateVacuumEntity):
         self._entry: ConfigEntry = entry
         self._attr_supported_features = SUPPORT_ROBOT
         self._attr_unique_id = f"{entry.unique_id}_vacuum"
-        self._attr_name = entry.title
+        self._attr_name = None
 
     def _handle_coordinator_update(self):
         """Update all attributes."""
@@ -91,6 +93,19 @@ class RoombaVacuum(CoordinatorEntity, StateVacuumEntity):
         self._attr_available = data != {}
         self._attr_extra_state_attributes = createExtendedAttributes(self)
         self._async_write_ha_state()
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Return the Roomba's device information."""
+        data = self.coordinator.data or {}
+        return DeviceInfo(
+            identifiers={(DOMAIN, self._entry.unique_id)},
+            name=data.get("name", "Roomba"),
+            manufacturer="iRobot",
+            model="Roomba",
+            model_id=data.get("sku"),
+            sw_version=data.get("softwareVer"),
+        )
 
     async def _action(self, endpoint: str) -> None:
         async with self.coordinator.session.get(
