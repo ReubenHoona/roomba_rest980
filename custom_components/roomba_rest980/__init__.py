@@ -81,7 +81,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await _async_register_services(hass)
 
     # Forward platforms; create tasks but await to ensure no failure?
-    await hass.config_entries.async_forward_entry_setups(entry, ["vacuum", "sensor"])
+    await hass.config_entries.async_forward_entry_setups(
+        entry, ["vacuum", "sensor", "select", "switch"]
+    )
 
     return True
 
@@ -146,7 +148,7 @@ async def _async_register_services(hass: HomeAssistant) -> None:
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Safely remove Roombas."""
     await hass.config_entries.async_unload_platforms(
-        entry, ["vacuum", "select", "sensor", "button", "camera"]
+        entry, ["vacuum", "select", "switch", "sensor", "button", "camera"]
     )
     return True
 
@@ -174,7 +176,7 @@ async def _async_setup_cloud(
             # Use stored BLID from config entry
             entry.runtime_data.robot_blid = entry.data["robot_blid"]
         await hass.config_entries.async_forward_entry_setups(
-            entry, ["select", "button", "camera"]
+            entry, ["button", "camera"]
         )
 
     except Exception as e:  # pylint: disable=broad-except
