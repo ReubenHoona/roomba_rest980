@@ -1,12 +1,49 @@
-# services.yaml
-action:
+rest980_action:
+  name: Send rest980 action
+  description: >-
+    Send a vacuum action (start/stop/pause/dock/resume) directly to the rest980
+    server. Use the entity service `vacuum.start` etc. by preference; this
+    service is a low-level escape hatch for rest980 endpoints with no entity.
   fields:
-    command:
+    base_url:
+      name: Base URL
+      description: rest980 base URL (e.g. http://localhost:3000)
       required: true
-      example: "dock"
+      example: "http://localhost:3000"
+      selector:
+        text:
+    action:
+      name: Action
+      description: rest980 /api/local/action/* endpoint name.
+      required: true
+      example: dock
+      selector:
+        select:
+          options:
+            - start
+            - stop
+            - pause
+            - dock
+            - resume
 
-clean:
+rest980_clean:
+  name: Send rest980 clean payload
+  description: >-
+    POST a JSON payload to /api/local/action/cleanRoom. Used internally by the
+    favorites button entity; advanced users can call it directly to trigger
+    per-room cleaning.
   fields:
+    base_url:
+      name: Base URL
+      description: rest980 base URL (e.g. http://localhost:3000)
+      required: true
+      example: "http://localhost:3000"
+      selector:
+        text:
     payload:
+      name: Payload
+      description: cleanRoom JSON body (regions / pmap_id / params).
       required: true
       example: '{"regions": [{"region_id": "11", "type": "rid"}]}'
+      selector:
+        object:
