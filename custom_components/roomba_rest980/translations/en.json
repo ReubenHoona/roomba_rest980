@@ -18,6 +18,21 @@
           "irobot_username": "iRobot Username",
           "irobot_password": "iRobot Password"
         }
+      },
+      "reauth_confirm": {
+        "title": "Re-enter iRobot Home credentials",
+        "description": "Cloud authentication failed. Please confirm your iRobot Home credentials.",
+        "data": {
+          "irobot_username": "iRobot Username",
+          "irobot_password": "iRobot Password"
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure Roomba integration",
+        "data": {
+          "base_url": "rest980 Base URL",
+          "cloud_api": "Enable cloud features?"
+        }
       }
     },
     "error": {
@@ -28,7 +43,9 @@
       "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
     },
     "abort": {
-      "missing_user_data": "Forgot the local Rest980 data."
+      "missing_user_data": "Forgot the local Rest980 data.",
+      "reauth_successful": "Re-authentication was successful.",
+      "reconfigure_successful": "Reconfiguration was successful."
     }
   }
 }
